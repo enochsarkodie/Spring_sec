@@ -28,7 +28,7 @@ public class AuthenticationService {
     @Value("${confirmationUrl}")
     private String activationUrl;
 
-    public AuthenticationDAO registerUser(RegistrationDTO registrationDTO) throws MessagingException {
+    public void registerUser(RegistrationDTO registrationDTO) throws MessagingException {
         var user = User.builder()
                 .firstName(registrationDTO.getFirstName())
                 .lastName(registrationDTO.getLastName())
@@ -40,11 +40,6 @@ public class AuthenticationService {
                 .build();
         userRepository.save(user);
         sendValidationEmail(user);
-        return AuthenticationDAO
-                .builder()
-                .status("success")
-                .message("registration successful")
-                .build();
 
     }
 
@@ -58,6 +53,7 @@ public class AuthenticationService {
                 activationUrl,
                 (String) newToken,
                 "Account activation"
+                //work on the response
         );
     }
 
