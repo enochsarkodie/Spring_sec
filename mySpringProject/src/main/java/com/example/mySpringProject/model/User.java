@@ -10,6 +10,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 
+import javax.security.auth.Subject;
+import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,7 +20,7 @@ import java.util.List;
 @Data
 @Builder
 @Table
-public class User implements UserDetails {
+public class User implements UserDetails, Principal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -82,4 +84,14 @@ public class User implements UserDetails {
     }
 
     public  String fullName(){return firstName + " " + lastName; }
+
+    @Override
+    public String getName() {
+        return fullName();
+    }
+
+    @Override
+    public boolean implies(Subject subject) {
+        return Principal.super.implies(subject);
+    }
 }
