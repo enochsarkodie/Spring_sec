@@ -16,7 +16,7 @@ server.port = 8088
 ##auth
 secret-key =AF55AA73DE6B8DA7DBB96F2BAC9E8
 jwtExpiration = 8640000
-confirmationUrl = http://localhost:8088/activate-account
+confirmationUrl = http://localhost:8088/acticate-account
 
 
 spring.mail.host=smtp.gmail.com

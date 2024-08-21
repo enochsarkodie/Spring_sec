@@ -1,6 +1,7 @@
 package com.example.mySpringProject.service;
 
 import com.example.mySpringProject.EmailTemplateName.EmailTemplateName;
+import com.example.mySpringProject.dtos.AccountLoginDTO;
 import com.example.mySpringProject.dtos.RegistrationDTO;
 import com.example.mySpringProject.model.TokenModel.Token;
 import com.example.mySpringProject.model.role.Role;
@@ -11,11 +12,15 @@ import com.example.mySpringProject.repositories.UserRepository;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 
 
 @Service
@@ -25,10 +30,12 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
     @Value("${confirmationUrl}")
     private String activationUrl;
 
-    public AuthenticationDAO registerUser(RegistrationDTO registrationDTO) throws MessagingException {
+    public void registerUser(RegistrationDTO registrationDTO) throws MessagingException {
         var user = User.builder()
                 .firstName(registrationDTO.getFirstName())
                 .lastName(registrationDTO.getLastName())
@@ -40,11 +47,6 @@ public class AuthenticationService {
                 .build();
         userRepository.save(user);
         sendValidationEmail(user);
-        return AuthenticationDAO
-                .builder()
-                .status("success")
-                .message("registration successful")
-                .build();
 
     }
 
@@ -54,10 +56,11 @@ public class AuthenticationService {
         emailService.sendEmail(
                 user.getEmail(),
                 user.fullName(),
-                EmailTemplateName.ACTIVATION_ACCOUNT,
+                EmailTemplateName.ACTIVATE_ACCOUNT,
                 activationUrl,
                 (String) newToken,
                 "Account activation"
+                //work on the response
         );
     }
 
@@ -84,7 +87,41 @@ public class AuthenticationService {
         }
 
         return codeBuilder.toString();
+
+
     }
 
+    public AuthenticationDAO login (AccountLoginDTO loginDTO){
+        var auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginDTO.getEmail(),
+                        loginDTO.getPassword()
+                )
+        );
+          var claims = new HashMap<String, Object>();
+          var user = ((User)auth.getPrincipal());
+          claims.put("fullName", user.fullName());
+          var jwtToken = jwtService.generateToken(claims,user);
+        return AuthenticationDAO.builder()
+                .token(jwtToken).build();
+    }
+
+//@Transactional
+    public void activateAccount(String token) throws MessagingException {
+        Token savedToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid token"));
+        if(LocalDateTime.now().isAfter(savedToken.getExpiresAt())){
+            sendValidationEmail(savedToken.getUser());
+            throw new RuntimeException("Activation token has expired, A new token has been sent to your mail ");
+        }
+        var user = userRepository.findById(savedToken.getUser().getId()).orElseThrow
+                (()-> new UsernameNotFoundException("User not found"));
+
+        user.setEnabled(true);
+        userRepository.save(user);
+        savedToken.setValidatedAt(LocalDateTime.now());
+        tokenRepository.save(savedToken);
+
+    }
 
 }
