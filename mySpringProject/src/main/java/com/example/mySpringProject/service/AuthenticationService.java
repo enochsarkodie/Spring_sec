@@ -36,6 +36,9 @@ public class AuthenticationService {
     private String activationUrl;
 
     public void registerUser(RegistrationDTO registrationDTO) throws MessagingException {
+        if(userRepository.existsByEmail(registrationDTO.getEmail())){
+            throw new MessagingException("Email already exist");
+        }
         var user = User.builder()
                 .firstName(registrationDTO.getFirstName())
                 .lastName(registrationDTO.getLastName())
@@ -47,6 +50,8 @@ public class AuthenticationService {
                 .build();
         userRepository.save(user);
         sendValidationEmail(user);
+
+
 
     }
 
@@ -103,7 +108,10 @@ public class AuthenticationService {
           claims.put("fullName", user.fullName());
           var jwtToken = jwtService.generateToken(claims,user);
         return AuthenticationDAO.builder()
-                .token(jwtToken).build();
+                .status("200")
+                .message("Login successful!")
+                .token(jwtToken)
+                .build();
     }
 
 //@Transactional

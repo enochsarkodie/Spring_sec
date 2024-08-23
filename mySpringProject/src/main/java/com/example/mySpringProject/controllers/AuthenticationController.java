@@ -24,12 +24,11 @@ public class AuthenticationController {
         return ResponseEntity.accepted().build();
     }
 
-    @PostMapping(path = "/login")
-    public ResponseEntity<AuthenticationDAO> login( @RequestBody @Valid AccountLoginDTO loginDTO){
-      return ResponseEntity.ok(authenticationService.login(loginDTO));
- }
-
-    @GetMapping(path = "/activate-account")
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationDAO> login (@RequestBody @Valid AccountLoginDTO loginDTO){
+        return ResponseEntity.ok(authenticationService.login(loginDTO));
+    }
+    @GetMapping("/activate-account")
     public void confirm(
             @RequestParam String token
      ) throws MessagingException{

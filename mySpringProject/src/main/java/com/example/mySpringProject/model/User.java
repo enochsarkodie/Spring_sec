@@ -3,8 +3,10 @@ package com.example.mySpringProject.model;
 
 import com.example.mySpringProject.model.role.Role;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,13 +21,17 @@ import java.util.List;
 @Entity(name = "users")
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table
 public class User implements UserDetails, Principal {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     private String password;
+
+
 
     @Column(name= "email", nullable = false, unique = true, length = 320)
     private String email;
@@ -44,7 +50,6 @@ public class User implements UserDetails, Principal {
     private boolean accountLocked;
 
     private boolean enabled;
-
 
 
 
