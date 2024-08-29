@@ -1,11 +1,13 @@
 package com.example.mySpringProject.dao;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
-public class AuthenticationDAO {
+public class AuthenticationDAO  {
     private String status;
     private String message;
     private String token;
