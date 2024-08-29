@@ -10,10 +10,13 @@ import com.example.mySpringProject.dao.AuthenticationDAO;
 import com.example.mySpringProject.repositories.TokenRepository;
 import com.example.mySpringProject.repositories.UserRepository;
 import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 
 
 @Service
@@ -96,23 +100,6 @@ public class AuthenticationService {
 
     }
 
-    public AuthenticationDAO login (AccountLoginDTO loginDTO){
-        var auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginDTO.getEmail(),
-                        loginDTO.getPassword()
-                )
-        );
-          var claims = new HashMap<String, Object>();
-          var user = ((User)auth.getPrincipal());
-          claims.put("fullName", user.fullName());
-          var jwtToken = jwtService.generateToken(claims,user);
-        return AuthenticationDAO.builder()
-                .status("200")
-                .message("Login successful!")
-                .token(jwtToken)
-                .build();
-    }
 
 //@Transactional
     public void activateAccount(String token) throws MessagingException {
@@ -131,5 +118,42 @@ public class AuthenticationService {
         tokenRepository.save(savedToken);
 
     }
+
+    public AuthenticationDAO authenticate(@Valid AccountLoginDTO request) {
+        try {
+            var auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail().trim(),
+                            request.getPassword().trim()
+                    )
+            );
+
+            var claims = new HashMap<String, Object>();
+            var user = ((User) auth.getPrincipal());
+            claims.put("fullName", user.fullName());
+
+            var jwtToken = jwtService.generateToken(claims, user);
+
+            return AuthenticationDAO.builder()
+                    .message("Login successful!")
+                    .status("200")
+                    .token(jwtToken)
+                    .build();
+
+        } catch (AuthenticationException e) {
+            return AuthenticationDAO.builder()
+                    .message("Login failed: " + e.getMessage())
+                    .status("401")
+                    .token(null)
+                    .build();
+        }
+    }
+
+
+    public List<User> getAllUsers(){
+        return  userRepository.findAll();
+
+    }
+
 
 }
