@@ -5,14 +5,15 @@ import org.springframework.http.HttpStatus;
 
 
 @Getter
-public enum BusinessErrorCodes {
+public enum ErrorResponse {
 
+    NOT_FOUND(404,HttpStatus.FORBIDDEN,"Not found"),
     ;
     private  final int code;
     private final String description;
     private final HttpStatus httpStatus;
 
-    BusinessErrorCodes(int code, HttpStatus httpStatus, String description){
+    ErrorResponse(int code, HttpStatus httpStatus, String description){
         this.code=code;
         this.description=description;
         this.httpStatus=httpStatus;

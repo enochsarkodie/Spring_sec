@@ -25,11 +25,11 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<?> registerUser(
+    public ResponseEntity<AuthenticationDAO> registerUser(
             @RequestBody @Valid RegistrationDTO registrationDTO)
             throws MessagingException {
-        authenticationService.registerUser(registrationDTO);
-        return ResponseEntity.accepted().build();
+     return  authenticationService.registerUser(registrationDTO);
+
     }
 
     @GetMapping("/activate-account")
