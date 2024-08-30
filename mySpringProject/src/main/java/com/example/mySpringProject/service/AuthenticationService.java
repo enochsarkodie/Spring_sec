@@ -13,8 +13,8 @@ import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,7 +39,7 @@ public class AuthenticationService {
     @Value("${confirmationUrl}")
     private String activationUrl;
 
-    public void registerUser(RegistrationDTO registrationDTO) throws MessagingException {
+    public ResponseEntity<AuthenticationDAO> registerUser(RegistrationDTO registrationDTO) throws MessagingException {
         if(userRepository.existsByEmail(registrationDTO.getEmail())){
             throw new MessagingException("Email already exist");
         }
@@ -55,7 +55,11 @@ public class AuthenticationService {
         userRepository.save(user);
         sendValidationEmail(user);
 
-
+        return ResponseEntity.ok(AuthenticationDAO.builder()
+                .message("Account registration Successful!" +
+                        " please check your mail to activate your account")
+                .status("200")
+                .build());
 
     }
 
@@ -75,7 +79,7 @@ public class AuthenticationService {
 
     private Object generateAndSaveActivationToken(User user) {
         //generateToken
-        String generatedToken = generateActivationCode(8);
+        String generatedToken = generateActivationCode();
         var token = Token.builder()
                 .token(generatedToken)
                 .createdAt(LocalDateTime.now())
@@ -86,11 +90,11 @@ public class AuthenticationService {
         return generatedToken ;
     }
 
-    private String generateActivationCode(int length ) {
+    private String generateActivationCode() {
         String characters = "123456789";
         StringBuilder codeBuilder = new StringBuilder();
         SecureRandom secureRandom = new SecureRandom();
-        for (int i= 0; i<length; i++){
+        for (int i = 0; i < 8; i ++){
             int randomIndex = secureRandom.nextInt(characters.length());
             codeBuilder.append(characters.charAt(randomIndex));
         }
@@ -144,7 +148,6 @@ public class AuthenticationService {
             return AuthenticationDAO.builder()
                     .message("Login failed: " + e.getMessage())
                     .status("401")
-                    .token(null)
                     .build();
         }
     }
