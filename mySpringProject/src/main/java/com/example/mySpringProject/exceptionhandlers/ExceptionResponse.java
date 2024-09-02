@@ -11,11 +11,13 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class ExceptionResponse {
-    private Integer businessErrorCodes;
-    private String businessErrorDescription;
+public class ExceptionResponse extends Exception {
+    private Integer errorCodes;
+    private String errorDescription;
     private String error;
     private Set<String> validationErrors;
     private Map<String, String> errors;
+
+    //treat this as our payload
 
 }
