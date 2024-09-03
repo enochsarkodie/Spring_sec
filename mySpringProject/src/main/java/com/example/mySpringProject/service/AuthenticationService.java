@@ -4,7 +4,7 @@ import com.example.mySpringProject.EmailTemplateName.EmailTemplateName;
 import com.example.mySpringProject.dtos.AccountLoginDTO;
 import com.example.mySpringProject.dtos.RegistrationDTO;
 import com.example.mySpringProject.exceptionhandlers.ErrorResponse;
-import com.example.mySpringProject.exceptionhandlers.ExceptionResponse;
+import com.example.mySpringProject.exceptionhandlers.ProjectException;
 import com.example.mySpringProject.model.TokenModel.Token;
 import com.example.mySpringProject.model.role.Role;
 import com.example.mySpringProject.model.User;
@@ -27,6 +27,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static com.example.mySpringProject.exceptionhandlers.ErrorResponse.EMAIL_ALREADY_EXIST;
 
@@ -43,10 +44,12 @@ public class AuthenticationService {
     @Value("${confirmationUrl}")
     private String activationUrl;
 
-    public ResponseEntity<AuthenticationDAO> registerUser(RegistrationDTO registrationDTO) throws MessagingException{
-        if(userRepository.existsByEmail(registrationDTO.getEmail())){
-            throw new MessagingException("Email already exist");
-        }
+    public ResponseEntity<AuthenticationDAO> registerUser(RegistrationDTO registrationDTO) throws ProjectException, MessagingException {
+
+        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(registrationDTO.getEmail());
+         if(existingUser.isPresent()){
+             throw new ProjectException(EMAIL_ALREADY_EXIST);
+         }
         var user = User.builder()
                 .firstName(registrationDTO.getFirstName())
                 .lastName(registrationDTO.getLastName())

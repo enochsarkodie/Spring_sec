@@ -3,6 +3,7 @@ package com.example.mySpringProject.controllers;
 import com.example.mySpringProject.dao.AuthenticationDAO;
 import com.example.mySpringProject.dtos.AccountLoginDTO;
 import com.example.mySpringProject.dtos.RegistrationDTO;
+import com.example.mySpringProject.exceptionhandlers.ProjectException;
 import com.example.mySpringProject.model.User;
 import com.example.mySpringProject.service.AuthenticationService;
 import jakarta.mail.MessagingException;
@@ -27,7 +28,7 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<AuthenticationDAO> registerUser(
             @RequestBody @Valid RegistrationDTO registrationDTO)
-            throws MessagingException {
+            throws ProjectException, MessagingException {
      return  authenticationService.registerUser(registrationDTO);
 
     }
