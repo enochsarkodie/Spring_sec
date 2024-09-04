@@ -44,7 +44,7 @@ public class AuthenticationService {
     @Value("${confirmationUrl}")
     private String activationUrl;
 
-    public ResponseEntity<AuthenticationDAO> registerUser(RegistrationDTO registrationDTO) throws ProjectException, MessagingException {
+    public ResponseEntity<AuthenticationDAO> registerUser( @Valid RegistrationDTO registrationDTO) throws ProjectException, MessagingException {
 
         Optional<User> existingUser = userRepository.findByEmailIgnoreCase(registrationDTO.getEmail());
          if(existingUser.isPresent()){
