@@ -3,9 +3,12 @@ package com.example.mySpringProject.exceptionhandlers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashSet;
+import java.util.Set;
 
 
 @RestControllerAdvice
@@ -18,6 +21,11 @@ public class GlobalExceptionHandler {
 
      switch (response){
          case EMAIL_ALREADY_EXIST -> status = HttpStatus.CONFLICT;
+         case
+                 INVALID_TOKEN,
+                 ACTIVATION_TOKEN_EXPIRED-> status = HttpStatus.UNAUTHORIZED;
+
+         case USER_NOT_FOUND -> status = HttpStatus.NOT_FOUND;
      }
 
      ProjectExceptionPayload projectExceptionPayload = new ProjectExceptionPayload(
@@ -27,5 +35,18 @@ public class GlobalExceptionHandler {
      );
 
     return new ResponseEntity<>(projectExceptionPayload,status);
+ }
+
+ @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object>handleExceptions( MethodArgumentNotValidException exp){
+     Set<String> errors = new HashSet<>();
+     exp.getBindingResult().getAllErrors()
+             .forEach(error ->{
+                 var errorMessages = error.getDefaultMessage();
+                 errors.add(errorMessages);
+                     });
+     return ResponseEntity
+             .status(HttpStatus.BAD_REQUEST)
+             .body(errors);
  }
 }

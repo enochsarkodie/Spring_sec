@@ -1,14 +1,13 @@
 package com.example.mySpringProject.service;
 
 import com.example.mySpringProject.EmailTemplateName.EmailTemplateName;
+import com.example.mySpringProject.dao.AuthenticationDAO;
 import com.example.mySpringProject.dtos.AccountLoginDTO;
 import com.example.mySpringProject.dtos.RegistrationDTO;
-import com.example.mySpringProject.exceptionhandlers.ErrorResponse;
 import com.example.mySpringProject.exceptionhandlers.ProjectException;
 import com.example.mySpringProject.model.TokenModel.Token;
-import com.example.mySpringProject.model.role.Role;
 import com.example.mySpringProject.model.User;
-import com.example.mySpringProject.dao.AuthenticationDAO;
+import com.example.mySpringProject.model.role.Role;
 import com.example.mySpringProject.repositories.TokenRepository;
 import com.example.mySpringProject.repositories.UserRepository;
 import jakarta.mail.MessagingException;
@@ -19,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.mySpringProject.exceptionhandlers.ErrorResponse.EMAIL_ALREADY_EXIST;
+import static com.example.mySpringProject.exceptionhandlers.ErrorResponse.*;
 
 
 @Service
@@ -80,7 +78,7 @@ public class AuthenticationService {
                 activationUrl,
                 (String) newToken,
                 "Account activation"
-                //work on the response
+
         );
     }
 
@@ -113,20 +111,25 @@ public class AuthenticationService {
 
 
 //@Transactional
-    public void activateAccount(String token) throws MessagingException {
+    public ResponseEntity<AuthenticationDAO> activateAccount(String token) throws MessagingException, ProjectException {
         Token savedToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid token"));
+                .orElseThrow(() -> new ProjectException(INVALID_TOKEN));
         if(LocalDateTime.now().isAfter(savedToken.getExpiresAt())){
             sendValidationEmail(savedToken.getUser());
-            throw new RuntimeException("Activation token has expired, A new token has been sent to your mail ");
+            throw new ProjectException(ACTIVATION_TOKEN_EXPIRED);
         }
         var user = userRepository.findById(savedToken.getUser().getId()).orElseThrow
-                (()-> new UsernameNotFoundException("User not found"));
+                (()-> new ProjectException(USER_NOT_FOUND));
 
         user.setEnabled(true);
         userRepository.save(user);
         savedToken.setValidatedAt(LocalDateTime.now());
         tokenRepository.save(savedToken);
+
+        return ResponseEntity.ok(AuthenticationDAO.builder()
+                .message("Account activated successfully!")
+                .status("200")
+                .build());
 
     }
 
