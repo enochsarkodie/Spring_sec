@@ -21,6 +21,11 @@ public class GlobalExceptionHandler {
 
      switch (response){
          case EMAIL_ALREADY_EXIST -> status = HttpStatus.CONFLICT;
+         case
+                 INVALID_TOKEN,
+                 ACTIVATION_TOKEN_EXPIRED-> status = HttpStatus.UNAUTHORIZED;
+
+         case USER_NOT_FOUND -> status = HttpStatus.NOT_FOUND;
      }
 
      ProjectExceptionPayload projectExceptionPayload = new ProjectExceptionPayload(

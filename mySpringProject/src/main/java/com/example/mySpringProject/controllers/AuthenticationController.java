@@ -34,10 +34,10 @@ public class AuthenticationController {
     }
 
     @GetMapping("/activate-account")
-    public void confirm(
+    public ResponseEntity<AuthenticationDAO> confirm(
             @RequestParam String token
-     ) throws MessagingException{
-        authenticationService.activateAccount(token);
+     ) throws MessagingException, ProjectException{
+        return ResponseEntity.ok(authenticationService.activateAccount(token).getBody());
      }
 
     @PostMapping(path= "/login")
