@@ -52,6 +52,8 @@ public class User implements UserDetails, Principal {
     private boolean accountLocked;
 
     private boolean enabled;
+    @OneToOne(mappedBy = "user")
+    private ForgotPassword forgotPassword;
 
 
 
