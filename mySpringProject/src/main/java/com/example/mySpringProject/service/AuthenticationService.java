@@ -168,5 +168,14 @@ public class AuthenticationService {
 
     }
 
+    public ResponseEntity<AuthenticationDAO> forgotPassword(String email) throws ProjectException{
+        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(email);
+        if(existingUser.isEmpty()){
+            throw new ProjectException(USER_NOT_FOUND);
+        }
+
+        return null;
+    }
+
 
 }
