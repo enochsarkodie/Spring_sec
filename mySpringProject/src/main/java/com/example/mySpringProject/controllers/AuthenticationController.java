@@ -47,11 +47,11 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
-     @GetMapping(path = "/users")
-    public List<User> getAllUsers(
-     ){
-        return (authenticationService.getAllUsers());
-     }
+//     @GetMapping(path = "/users")
+//    public List<User> getAllUsers(
+//     ){
+//        return (authenticationService.getAllUsers());
+//     }
 
 
     }

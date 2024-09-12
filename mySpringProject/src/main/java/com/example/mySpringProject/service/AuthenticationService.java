@@ -71,7 +71,7 @@ public class AuthenticationService {
     private void sendValidationEmail(User user) throws MessagingException {
 
         var newToken = generateAndSaveActivationToken(user);
-        emailService.sendEmail(
+        emailService.sendConfirmationEmail(
                 user.getEmail(),
                 user.fullName(),
                 EmailTemplateName.ACTIVATE_ACCOUNT,
@@ -162,11 +162,6 @@ public class AuthenticationService {
         }
     }
 
-
-    public List<User> getAllUsers(){
-        return  userRepository.findAll();
-
-    }
 
     public ResponseEntity<AuthenticationDAO> forgotPassword(String email) throws ProjectException{
         Optional<User> existingUser = userRepository.findByEmailIgnoreCase(email);

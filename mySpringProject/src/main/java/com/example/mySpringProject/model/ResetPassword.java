@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ForgotPassword {
+public class ResetPassword {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String Id;

@@ -3,6 +3,7 @@ package com.example.mySpringProject.service;
 import com.example.mySpringProject.EmailTemplateName.EmailTemplateName;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -22,8 +23,11 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
+
+    @Value("${email_sender")
+    private String EMAIL_SENDER;
     @Async
-    public void sendEmail(String to,
+    public void sendConfirmationEmail(String to,
                           String username,
                           EmailTemplateName emailTemplateName,
                           String confirmationUrl,
@@ -49,7 +53,7 @@ public class EmailService {
         Context context = new Context();
         context.setVariables(properties);
 
-        helper.setFrom("enochsarkodie07@gmail.com");
+        helper.setFrom(EMAIL_SENDER);
         helper.setTo(to);
         helper.setSubject(subject);
 
@@ -59,6 +63,26 @@ public class EmailService {
 
         mailSender.send(mimeMessage);
 
+    }
+
+    public void sendEmail(EmailTemplateName templateName,
+                          String emailReceiver,
+                          String subject,
+                          Map<String, Object> variables) throws MessagingException{
+
+        Context context = new Context();
+        context.setVariables(variables);
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true,"UTF-8");
+        helper.setPriority(1);
+        helper.setSubject(subject);
+        helper.setFrom(EMAIL_SENDER);
+        helper.setTo(emailReceiver);
+
+        String template = templateEngine.process(String.valueOf(templateName), context);
+        helper.setText(template,true);
+        mailSender.send(mimeMessage);
 
 
     }
