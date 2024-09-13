@@ -53,7 +53,7 @@ public class User implements UserDetails, Principal {
 
     private boolean enabled;
     @OneToOne(mappedBy = "user")
-    private ResetPassword resetPassword;
+    private ResetPasswordToken resetPassword;
 
 
 

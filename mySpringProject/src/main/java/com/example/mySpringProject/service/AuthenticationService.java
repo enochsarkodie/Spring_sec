@@ -2,12 +2,15 @@ package com.example.mySpringProject.service;
 
 import com.example.mySpringProject.EmailTemplateName.EmailTemplateName;
 import com.example.mySpringProject.dao.AuthenticationDAO;
+import com.example.mySpringProject.dao.ForgotPasswordRequest;
 import com.example.mySpringProject.dtos.AccountLoginDTO;
 import com.example.mySpringProject.dtos.RegistrationDTO;
 import com.example.mySpringProject.exceptionhandlers.ProjectException;
+import com.example.mySpringProject.model.ResetPasswordToken;
 import com.example.mySpringProject.model.TokenModel.Token;
 import com.example.mySpringProject.model.User;
 import com.example.mySpringProject.model.role.Role;
+import com.example.mySpringProject.repositories.ResetPasswordTokenRepository;
 import com.example.mySpringProject.repositories.TokenRepository;
 import com.example.mySpringProject.repositories.UserRepository;
 import jakarta.mail.MessagingException;
@@ -24,8 +27,9 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.example.mySpringProject.exceptionhandlers.ErrorResponse.*;
 
@@ -39,6 +43,7 @@ public class AuthenticationService {
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final ResetPasswordTokenRepository resetPasswordTokenRepository;
     @Value("${confirmationUrl}")
     private String activationUrl;
 
@@ -163,13 +168,37 @@ public class AuthenticationService {
     }
 
 
-    public ResponseEntity<AuthenticationDAO> forgotPassword(String email) throws ProjectException{
-        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(email);
-        if(existingUser.isEmpty()){
-            throw new ProjectException(USER_NOT_FOUND);
-        }
+    public ResponseEntity<AuthenticationDAO> forgotPassword(ForgotPasswordRequest request) throws ProjectException, MessagingException {
+        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(request.getEmail());
+            if (existingUser.isEmpty()) {
+                throw new ProjectException(USER_NOT_FOUND);
+            }
 
-        return null;
+        ResetPasswordToken token = new ResetPasswordToken();
+            token.setToken(UUID.randomUUID().toString());
+            token.setUser(existingUser.get());
+            token.setCreatedAt(LocalDateTime.now());
+            token.setExpiresAt(LocalDateTime.now().plusMinutes(10));
+            resetPasswordTokenRepository.save(token);
+
+        Map<String, Object> resetPasswordTemplate = Map.of(
+                "username", existingUser.get().getUsername(),
+                "token",token
+        );
+
+            emailService.sendEmail(
+                    EmailTemplateName.RESET_PASSWORD,
+                    request.getEmail(),
+                    "Reset Password",
+                    resetPasswordTemplate
+                    );
+
+
+            return ResponseEntity.ok(AuthenticationDAO.builder()
+                    .message("Password reset link successfully sent to your gmail")
+                    .status("200")
+                    .build());
+
     }
 
 

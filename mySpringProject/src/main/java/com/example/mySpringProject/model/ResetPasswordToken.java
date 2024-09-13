@@ -1,24 +1,25 @@
 package com.example.mySpringProject.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
+@Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ResetPassword {
+public class ResetPasswordToken {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String Id;
-    private Integer otp;
-    private Date expirationDate;
+    private String otp;
+    private String token;
+    private LocalDateTime createdAt;
+    private LocalDateTime expiresAt;
     @OneToOne
     private User user;
 

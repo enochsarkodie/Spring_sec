@@ -1,6 +1,7 @@
 package com.example.mySpringProject.controllers;
 
 import com.example.mySpringProject.dao.AuthenticationDAO;
+import com.example.mySpringProject.dao.ForgotPasswordRequest;
 import com.example.mySpringProject.dtos.AccountLoginDTO;
 import com.example.mySpringProject.dtos.RegistrationDTO;
 import com.example.mySpringProject.exceptionhandlers.ProjectException;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.PreparedStatement;
@@ -47,12 +49,11 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
-//     @GetMapping(path = "/users")
-//    public List<User> getAllUsers(
-//     ){
-//        return (authenticationService.getAllUsers());
-//     }
-
+    @PostMapping(path = "/forgot-password")
+    public ResponseEntity<AuthenticationDAO> forgotPassword(
+            @RequestBody ForgotPasswordRequest request)throws ProjectException, MessagingException{
+        return ResponseEntity.ok(authenticationService.forgotPassword(request).getBody());
+    }
 
     }
 
