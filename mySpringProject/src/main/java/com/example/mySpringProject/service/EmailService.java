@@ -2,6 +2,7 @@ package com.example.mySpringProject.service;
 
 import com.example.mySpringProject.EmailTemplateName.EmailTemplateName;
 import jakarta.mail.MessagingException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -26,6 +27,8 @@ public class EmailService {
 
     @Value("${email_sender")
     private String EMAIL_SENDER;
+
+
     @Async
     public void sendConfirmationEmail(String to,
                           String username,

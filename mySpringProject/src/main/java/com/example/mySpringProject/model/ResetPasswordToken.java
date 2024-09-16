@@ -1,5 +1,6 @@
 package com.example.mySpringProject.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,11 +17,11 @@ public class ResetPasswordToken {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String Id;
-    private String otp;
     private String token;
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
     @OneToOne
+    @JoinColumn(nullable = false)
     private User user;
 
 

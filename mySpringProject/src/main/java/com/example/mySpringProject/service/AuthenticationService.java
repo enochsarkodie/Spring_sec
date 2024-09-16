@@ -89,7 +89,7 @@ public class AuthenticationService {
 
     private Object generateAndSaveActivationToken(User user) {
         //generateToken
-        String generatedToken = generateActivationCode();
+        String generatedToken = generateActivationCode(8);
         var token = Token.builder()
                 .token(generatedToken)
                 .createdAt(LocalDateTime.now())
@@ -100,7 +100,7 @@ public class AuthenticationService {
         return generatedToken ;
     }
 
-    private String generateActivationCode() {
+    private String generateActivationCode(int length) {
         String characters = "123456789";
         StringBuilder codeBuilder = new StringBuilder();
         SecureRandom secureRandom = new SecureRandom();
@@ -174,14 +174,16 @@ public class AuthenticationService {
                 throw new ProjectException(USER_NOT_FOUND);
             }
 
-        ResetPasswordToken token = new ResetPasswordToken();
-            token.setToken(UUID.randomUUID().toString());
-            token.setUser(existingUser.get());
-            token.setCreatedAt(LocalDateTime.now());
-            token.setExpiresAt(LocalDateTime.now().plusMinutes(10));
+            String generatedCode = generateActivationCode(6);
+            var token = ResetPasswordToken.builder()
+                    .token(generatedCode)
+                    .createdAt(LocalDateTime.now())
+                    .expiresAt(LocalDateTime.now().plusMinutes(5))
+                    .user(existingUser.get().getResetPassword().getUser())
+                    .build();
             resetPasswordTokenRepository.save(token);
 
-        Map<String, Object> resetPasswordTemplate = Map.of(
+        Map<String, Object> variables = Map.of(
                 "username", existingUser.get().getUsername(),
                 "token",token
         );
@@ -190,7 +192,7 @@ public class AuthenticationService {
                     EmailTemplateName.RESET_PASSWORD,
                     request.getEmail(),
                     "Reset Password",
-                    resetPasswordTemplate
+                    variables
                     );
 
 
