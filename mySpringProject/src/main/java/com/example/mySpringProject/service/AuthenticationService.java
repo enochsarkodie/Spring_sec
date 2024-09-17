@@ -174,33 +174,41 @@ public class AuthenticationService {
                 throw new ProjectException(USER_NOT_FOUND);
             }
 
-            String generatedCode = generateActivationCode(6);
-            var token = ResetPasswordToken.builder()
-                    .token(generatedCode)
-                    .createdAt(LocalDateTime.now())
-                    .expiresAt(LocalDateTime.now().plusMinutes(5))
-                    .user(existingUser.get().getResetPassword().getUser())
-                    .build();
-            resetPasswordTokenRepository.save(token);
-
-        Map<String, Object> variables = Map.of(
-                "username", existingUser.get().getUsername(),
-                "token",token
-        );
-
-            emailService.sendEmail(
-                    EmailTemplateName.RESET_PASSWORD,
-                    request.getEmail(),
-                    "Reset Password",
-                    variables
-                    );
-
+            generateAndSaveResetPasswordToken(existingUser.get());
+            sendResetPasswordEmail(existingUser.get());
 
             return ResponseEntity.ok(AuthenticationDAO.builder()
                     .message("Password reset link successfully sent to your gmail")
                     .status("200")
                     .build());
 
+    }
+
+    public Object generateAndSaveResetPasswordToken(User user){
+        String generatedCode = generateActivationCode(6);
+        var token = ResetPasswordToken.builder()
+                .verificationCode(generatedCode)
+                .createdAt(LocalDateTime.now())
+                .expiresAt(LocalDateTime.now().plusMinutes(15))
+                .user(user)
+                .build();
+        resetPasswordTokenRepository.save(token);
+        return generatedCode;
+    }
+
+    private void sendResetPasswordEmail(User user) throws MessagingException{
+        var newToken = generateAndSaveResetPasswordToken(user);
+        Map<String, Object> variables = Map.of(
+                "username", user.getUsername(),
+                "token", newToken
+        );
+        emailService.sendEmail(
+                EmailTemplateName.RESET_PASSWORD,
+                user.getEmail(),
+                "Reset Password",
+                variables
+
+        );
     }
 
 

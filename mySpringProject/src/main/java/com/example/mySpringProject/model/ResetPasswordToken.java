@@ -17,7 +17,7 @@ public class ResetPasswordToken {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String Id;
-    private String token;
+    private String verificationCode;
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
     @OneToOne
