@@ -24,5 +24,9 @@ public class ResetPasswordToken {
     @JoinColumn(nullable = false)
     private User user;
 
+    public ResetPasswordToken ( User user){
+        this.user = user;
+    }
 
+    public  ResetPasswordToken(){}
 }
