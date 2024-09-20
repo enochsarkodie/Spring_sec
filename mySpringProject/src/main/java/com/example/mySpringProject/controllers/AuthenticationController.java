@@ -5,18 +5,15 @@ import com.example.mySpringProject.dao.ForgotPasswordRequest;
 import com.example.mySpringProject.dtos.AccountLoginDTO;
 import com.example.mySpringProject.dtos.RegistrationDTO;
 import com.example.mySpringProject.exceptionhandlers.ProjectException;
-import com.example.mySpringProject.model.User;
 import com.example.mySpringProject.service.AuthenticationService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.PreparedStatement;
-import java.util.List;
+
 
 @RestController
 @RequestMapping("api/v1/auth")

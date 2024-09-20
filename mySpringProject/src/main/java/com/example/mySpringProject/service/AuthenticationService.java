@@ -1,6 +1,6 @@
 package com.example.mySpringProject.service;
 
-import com.example.mySpringProject.EmailTemplateName.EmailTemplateName;
+import com.example.mySpringProject.emailTemplateName.EmailTemplateName;
 import com.example.mySpringProject.dao.AuthenticationDAO;
 import com.example.mySpringProject.dao.ForgotPasswordRequest;
 import com.example.mySpringProject.dtos.AccountLoginDTO;
@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.example.mySpringProject.exceptionhandlers.ErrorResponse.*;
 
@@ -111,7 +110,9 @@ public class AuthenticationService {
 
         return codeBuilder.toString();
 
-
+/*@author enoch_sarkodie, in here we have the register account, login, activate account and reset
+password functionality. Further details will be given soon since I'm still trying out new approaches on the
+password reset functionality..*/
     }
 
 

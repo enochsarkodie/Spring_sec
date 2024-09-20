@@ -1,4 +1,4 @@
-package com.example.mySpringProject.EmailTemplateName;
+package com.example.mySpringProject.emailTemplateName;
 
 import lombok.Getter;
 
