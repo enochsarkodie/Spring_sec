@@ -109,14 +109,10 @@ public class AuthenticationService {
         }
 
         return codeBuilder.toString();
-
-/*@author enoch_sarkodie, in here we have the register account, login, activate account and reset
-password functionality. Further details will be given soon since I'm still trying out new approaches on the
-password reset functionality..*/
     }
 
 
-//@Transactional
+
     public ResponseEntity<AuthenticationDAO> activateAccount(String token) throws MessagingException, ProjectException {
         Token savedToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new ProjectException(INVALID_TOKEN));
