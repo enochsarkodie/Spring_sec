@@ -103,7 +103,7 @@ public class AuthenticationService {
         String characters = "123456789";
         StringBuilder codeBuilder = new StringBuilder();
         SecureRandom secureRandom = new SecureRandom();
-        for (int i = 0; i < 8; i ++){
+        for (int i = 0; i < length; i ++){
             int randomIndex = secureRandom.nextInt(characters.length());
             codeBuilder.append(characters.charAt(randomIndex));
         }
