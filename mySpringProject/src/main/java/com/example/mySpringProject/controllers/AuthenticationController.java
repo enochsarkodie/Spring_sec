@@ -5,6 +5,7 @@ import com.example.mySpringProject.dao.ForgotPasswordRequest;
 import com.example.mySpringProject.dtos.AccountLoginDTO;
 import com.example.mySpringProject.dtos.RegistrationDTO;
 import com.example.mySpringProject.exceptionhandlers.ProjectException;
+import com.example.mySpringProject.model.User;
 import com.example.mySpringProject.service.AuthenticationService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 
 @RestController
@@ -52,6 +54,10 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.forgotPassword(request).getBody());
     }
 
+    @GetMapping( path = "/getAllUsers")
+    public List<User> getAllUsers(){
+        return authenticationService.getAllUsers();
+    }
     }
 
 

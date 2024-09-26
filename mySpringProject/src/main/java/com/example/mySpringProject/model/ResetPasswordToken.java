@@ -22,5 +22,4 @@ public class ResetPasswordToken {
     @JoinColumn(nullable = false)
     private User user;
 
-
 }
