@@ -54,9 +54,9 @@ public class User implements UserDetails, Principal {
 
     private boolean enabled;
 
-    @OneToOne(mappedBy = "user")
-    @JsonBackReference
-    private ResetPasswordToken resetPasswordToken;
+//    @OneToOne(mappedBy = "user")
+//    @JsonBackReference
+//    private ResetPasswordToken resetPasswordToken;
 
 
     @Override
