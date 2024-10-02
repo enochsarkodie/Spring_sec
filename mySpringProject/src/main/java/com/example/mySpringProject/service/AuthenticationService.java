@@ -165,48 +165,21 @@ public class AuthenticationService {
         }
     }
 
-
-    public ResponseEntity<AuthenticationDAO> forgotPassword(ForgotPasswordRequest request) throws ProjectException, MessagingException {
-        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(request.getEmail());
-            if (existingUser.isEmpty()) {
-                throw new ProjectException(USER_NOT_FOUND);
-            }
-
-            generateAndSaveResetPasswordToken(existingUser.get());
-            sendResetPasswordEmail(existingUser.get());
-
-            return ResponseEntity.ok(AuthenticationDAO.builder()
-                    .message("Password reset link successfully sent to your gmail")
-                    .status("200")
-                    .build());
+    public void generatePasswordResetTokenForUser (User user, String token){
+        ResetPasswordToken passwordResetToken = new ResetPasswordToken();
+        passwordResetToken.setToken(token);
+        passwordResetToken.setCreatedAt(LocalDateTime.now());
+        passwordResetToken.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+        passwordResetToken.setUser(user);
+        resetPasswordTokenRepository.save(passwordResetToken);
 
     }
 
-    public Object generateAndSaveResetPasswordToken(User user){
-        String generatedCode = generateActivationCode(6);
-        var token = ResetPasswordToken.builder()
-                .verificationCode(generatedCode)
-                .createdAt(LocalDateTime.now())
-                .expiresAt(LocalDateTime.now().plusMinutes(15))
-                .user(user)
-                .build();
-        resetPasswordTokenRepository.save(token);
-        return generatedCode;
-    }
-
-    private void sendResetPasswordEmail(User user) throws MessagingException{
-        var newToken = generateAndSaveResetPasswordToken(user);
-        Map<String, Object> variables = Map.of(
-                "username", user.getUsername(),
-                "token", newToken
-        );
-        emailService.sendEmail(
-                EmailTemplateName.RESET_PASSWORD,
-                user.getEmail(),
-                "Reset Password",
-                variables
-
-        );
+    public void sendPasswordResetEmail (ForgotPasswordRequest forgotPasswordRequest)throws ProjectException{
+        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(forgotPasswordRequest.getEmail());
+        if(existingUser.isEmpty()){
+            throw new ProjectException(USER_NOT_FOUND);
+        }
     }
 
     public List<User> getAllUsers (){
