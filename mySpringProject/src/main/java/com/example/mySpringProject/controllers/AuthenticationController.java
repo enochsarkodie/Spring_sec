@@ -1,6 +1,7 @@
 package com.example.mySpringProject.controllers;
 
 import com.example.mySpringProject.dao.AuthenticationDAO;
+import com.example.mySpringProject.dao.ForgotPasswordRequest;
 import com.example.mySpringProject.dtos.AccountLoginDTO;
 import com.example.mySpringProject.dtos.RegistrationDTO;
 import com.example.mySpringProject.exceptionhandlers.ProjectException;
@@ -47,11 +48,11 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
-//    @PostMapping(path = "/forgot-password")
-//    public ResponseEntity<AuthenticationDAO> forgotPassword(
-//            @RequestBody ForgotPasswordRequest request)throws ProjectException, MessagingException{
-//        return ResponseEntity.ok(authenticationService.forgotPassword(request).getBody());
-//    }
+    @PostMapping(path = "/forgot-password")
+    public ResponseEntity<AuthenticationDAO> forgotPassword(
+            @RequestBody ForgotPasswordRequest request)throws ProjectException, MessagingException{
+        return ResponseEntity.ok(authenticationService.forgotPassword(request));
+    }
 
     @GetMapping( path = "/getAllUsers")
     public List<User> getAllUsers(){
