@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.example.mySpringProject.exceptionhandlers.ErrorResponse.*;
 
@@ -44,8 +41,12 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final ResetPasswordTokenRepository resetPasswordTokenRepository;
+
     @Value("${confirmationUrl}")
     private String activationUrl;
+
+    @Value("${resetPasswordUrl}")
+    private String resetPasswordUrl;
 
     public ResponseEntity<AuthenticationDAO> registerUser( @Valid RegistrationDTO registrationDTO) throws ProjectException, MessagingException {
 
@@ -89,7 +90,7 @@ public class AuthenticationService {
 
     private Object generateAndSaveActivationToken(User user) {
         //generateToken
-        String generatedToken = generateActivationCode(8);
+        String generatedToken = generateActivationCode();
         var token = Token.builder()
                 .token(generatedToken)
                 .createdAt(LocalDateTime.now())
@@ -100,11 +101,11 @@ public class AuthenticationService {
         return generatedToken ;
     }
 
-    private String generateActivationCode(int length) {
+    private String generateActivationCode() {
         String characters = "123456789";
         StringBuilder codeBuilder = new StringBuilder();
         SecureRandom secureRandom = new SecureRandom();
-        for (int i = 0; i < length; i ++){
+        for (int i = 0; i < 8; i ++){
             int randomIndex = secureRandom.nextInt(characters.length());
             codeBuilder.append(characters.charAt(randomIndex));
         }
@@ -175,11 +176,43 @@ public class AuthenticationService {
 
     }
 
-    public void sendPasswordResetEmail (ForgotPasswordRequest forgotPasswordRequest)throws ProjectException{
+    public AuthenticationDAO forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws ProjectException, MessagingException {
         Optional<User> existingUser = userRepository.findByEmailIgnoreCase(forgotPasswordRequest.getEmail());
         if(existingUser.isEmpty()){
             throw new ProjectException(USER_NOT_FOUND);
         }
+        User user = existingUser.get();
+        String token = UUID.randomUUID().toString();
+        generatePasswordResetTokenForUser(user, token);
+
+        String resetUrl = resetPasswordUrl + "?token=" + token;
+        Map<String, Object> resetPasswordVariables = Map.of(
+               "username", user.getUsername(),
+               "resetPasswordUrl",resetUrl
+        );
+
+        emailService.sendEmail(
+                EmailTemplateName.RESET_PASSWORD,
+                user.getEmail(),
+                "RESET PASSWORD",
+                resetPasswordVariables
+        );
+
+        return AuthenticationDAO.builder()
+                .message("Password Reset Link successfully sent to :" + user.getUsername())
+                .status("200")
+                .build();
+    }
+
+    public void validatePasswordResetToken (String token) throws ProjectException{
+     Optional<ResetPasswordToken> resetPasswordToken = resetPasswordTokenRepository.findByToken(token);
+     if(resetPasswordToken.isEmpty()){
+         throw new ProjectException(INVALID_TOKEN);
+     }
+     if(resetPasswordToken.get().getExpiresAt().isBefore(LocalDateTime.now())){
+         throw new ProjectException(ACTIVATION_TOKEN_EXPIRED);
+     }
+
     }
 
     public List<User> getAllUsers (){
