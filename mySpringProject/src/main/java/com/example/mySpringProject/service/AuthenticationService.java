@@ -194,7 +194,7 @@ public class AuthenticationService {
         emailService.sendEmail(
                 EmailTemplateName.RESET_PASSWORD,
                 user.getEmail(),
-                "RESET PASSWORD",
+                "Reset Password",
                 resetPasswordVariables
         );
 
