@@ -187,14 +187,14 @@ public class AuthenticationService {
 
         String resetUrl = resetPasswordUrl + "?token=" + token;
         Map<String, Object> resetPasswordVariables = Map.of(
-               "username", user.getUsername(),
+               "username", user.getName(),
                "resetPasswordUrl",resetUrl
         );
 
         emailService.sendEmail(
                 EmailTemplateName.RESET_PASSWORD,
                 user.getEmail(),
-                "RESET PASSWORD",
+                "Reset Password",
                 resetPasswordVariables
         );
 
