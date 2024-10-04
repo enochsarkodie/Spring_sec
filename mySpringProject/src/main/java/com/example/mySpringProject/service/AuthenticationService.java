@@ -187,7 +187,7 @@ public class AuthenticationService {
 
         String resetUrl = resetPasswordUrl + "?token=" + token;
         Map<String, Object> resetPasswordVariables = Map.of(
-               "username", user.getUsername(),
+               "username", user.getName(),
                "resetPasswordUrl",resetUrl
         );
 
