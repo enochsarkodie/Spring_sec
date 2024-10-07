@@ -1,5 +1,6 @@
 package com.example.mySpringProject.service;
 
+import com.example.mySpringProject.dao.ResetPasswordRequest;
 import com.example.mySpringProject.emailTemplateName.EmailTemplateName;
 import com.example.mySpringProject.dao.AuthenticationDAO;
 import com.example.mySpringProject.dao.ForgotPasswordRequest;
@@ -212,11 +213,27 @@ public class AuthenticationService {
      if(resetPasswordToken.get().getExpiresAt().isBefore(LocalDateTime.now())){
          throw new ProjectException(ACTIVATION_TOKEN_EXPIRED);
      }
-
     }
 
     public List<User> getAllUsers (){
         return userRepository.findAll();
+    }
+
+    public AuthenticationDAO resetPassword(String token, ResetPasswordRequest resetPasswordRequest) throws ProjectException {
+        var resetPasswordToken = resetPasswordTokenRepository.findByToken(token);
+        var newPassword = resetPasswordRequest.getNewPassword();
+
+
+        if(resetPasswordToken.isPresent()){
+            var userEmail = resetPasswordToken.get().getUser().getEmail();
+            var user = userRepository.findByEmailIgnoreCase(userEmail).orElseThrow(()-> new ProjectException(USER_NOT_FOUND));
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+        }
+
+
+        return null;
+
     }
 
 }
