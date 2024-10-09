@@ -51,7 +51,7 @@ public class AuthenticationService {
 
     public ResponseEntity<AuthenticationDAO> registerUser( @Valid RegistrationDTO registrationDTO) throws ProjectException, MessagingException {
 
-        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(registrationDTO.getEmail());
+         var existingUser = userRepository.findByEmailIgnoreCase(registrationDTO.getEmail());
          if(existingUser.isPresent()){
              throw new ProjectException(EMAIL_ALREADY_EXIST);
          }
