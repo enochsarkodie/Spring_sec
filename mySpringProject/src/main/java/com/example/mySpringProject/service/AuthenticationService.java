@@ -117,7 +117,7 @@ public class AuthenticationService {
 
 
     public ResponseEntity<AuthenticationDAO> activateAccount(String token) throws MessagingException, ProjectException {
-        Token savedToken = tokenRepository.findByToken(token)
+        var savedToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new ProjectException(INVALID_TOKEN));
         if(LocalDateTime.now().isAfter(savedToken.getExpiresAt())){
             sendValidationEmail(savedToken.getUser());
@@ -205,34 +205,37 @@ public class AuthenticationService {
                 .build();
     }
 
-    public void validatePasswordResetToken (String token) throws ProjectException{
-     Optional<ResetPasswordToken> resetPasswordToken = resetPasswordTokenRepository.findByToken(token);
-     if(resetPasswordToken.isEmpty()){
-         throw new ProjectException(INVALID_TOKEN);
-     }
-     if(resetPasswordToken.get().getExpiresAt().isBefore(LocalDateTime.now())){
-         throw new ProjectException(ACTIVATION_TOKEN_EXPIRED);
-     }
-    }
 
     public List<User> getAllUsers (){
         return userRepository.findAll();
     }
 
     public AuthenticationDAO resetPassword(String token, ResetPasswordRequest resetPasswordRequest) throws ProjectException {
-        var resetPasswordToken = resetPasswordTokenRepository.findByToken(token);
-        var newPassword = resetPasswordRequest.getNewPassword();
-
-
-        if(resetPasswordToken.isPresent()){
-            var userEmail = resetPasswordToken.get().getUser().getEmail();
-            var user = userRepository.findByEmailIgnoreCase(userEmail).orElseThrow(()-> new ProjectException(USER_NOT_FOUND));
-            user.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(user);
+        var resetPasswordTokenOpt = resetPasswordTokenRepository.findByToken(token);
+        if(resetPasswordTokenOpt.isEmpty()){
+            throw new ProjectException(INVALID_TOKEN);
+        }
+        ResetPasswordToken resetPasswordToken = resetPasswordTokenOpt.get();
+        if(resetPasswordToken.getExpiresAt().isBefore(LocalDateTime.now())){
+            throw new ProjectException(ACTIVATION_TOKEN_EXPIRED);
         }
 
+        var userEmail = resetPasswordToken.getUser().getEmail();
+        var user = userRepository.findByEmailIgnoreCase(userEmail).orElseThrow(()-> new ProjectException(USER_NOT_FOUND));
 
-        return null;
+        var newPassword = resetPasswordRequest.getNewPassword();
+        var confirmPassword = resetPasswordRequest.getConfirmPassword();
+
+        if(!newPassword.equals(confirmPassword)){
+            throw new ProjectException(PASSWORDS_DO_NOT_MATCH);
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return AuthenticationDAO.builder()
+                .message("Reset Password successful!")
+                .status("200")
+                .build();
 
     }
 

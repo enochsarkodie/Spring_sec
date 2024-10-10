@@ -20,7 +20,8 @@ public class GlobalExceptionHandler {
      HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
      switch (response){
-         case EMAIL_ALREADY_EXIST -> status = HttpStatus.CONFLICT;
+         case EMAIL_ALREADY_EXIST ,
+              PASSWORDS_DO_NOT_MATCH -> status = HttpStatus.CONFLICT;
          case    INVALID_TOKEN,
                  ACTIVATION_TOKEN_EXPIRED -> status = HttpStatus.UNAUTHORIZED;
 
