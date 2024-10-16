@@ -5,6 +5,7 @@ public enum ErrorResponse {
 
     EMAIL_ALREADY_EXIST("Email Already Exist"),
     INVALID_TOKEN("Invalid Token"),
+    TOKEN_DOES_NOT_EXIST("Token does not exist"),
     USER_NOT_FOUND("User not found"),
     FAILED_TO_SEND_EMAIL("Could not send email"),
     PASSWORDS_DO_NOT_MATCH("New password and confirm password does not match"),

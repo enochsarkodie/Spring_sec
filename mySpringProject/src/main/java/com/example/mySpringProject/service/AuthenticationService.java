@@ -119,7 +119,7 @@ public class AuthenticationService {
 
     public ResponseEntity<AuthenticationDAO> activateAccount(String token) throws MessagingException, ProjectException {
         var savedToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new ProjectException(INVALID_TOKEN));
+                .orElseThrow(() -> new ProjectException(TOKEN_DOES_NOT_EXIST));
         if(LocalDateTime.now().isAfter(savedToken.getExpiresAt())){
             sendValidationEmail(savedToken.getUser());
             throw new ProjectException(ACTIVATION_TOKEN_EXPIRED);
