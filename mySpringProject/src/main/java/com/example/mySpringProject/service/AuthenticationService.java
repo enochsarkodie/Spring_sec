@@ -15,6 +15,7 @@ import com.example.mySpringProject.repositories.ResetPasswordTokenRepository;
 import com.example.mySpringProject.repositories.TokenRepository;
 import com.example.mySpringProject.repositories.UserRepository;
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -210,6 +211,7 @@ public class AuthenticationService {
         return userRepository.findAll();
     }
 
+    @Transactional
     public AuthenticationDAO resetPassword(String token, ResetPasswordRequest resetPasswordRequest) throws ProjectException {
         var resetPasswordTokenOpt = resetPasswordTokenRepository.findByToken(token);
         if(resetPasswordTokenOpt.isEmpty()){

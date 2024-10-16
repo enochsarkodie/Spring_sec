@@ -10,6 +10,7 @@ import com.example.mySpringProject.model.User;
 import com.example.mySpringProject.service.AuthenticationService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
