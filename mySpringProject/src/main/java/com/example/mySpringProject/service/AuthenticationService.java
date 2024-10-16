@@ -15,6 +15,7 @@ import com.example.mySpringProject.repositories.ResetPasswordTokenRepository;
 import com.example.mySpringProject.repositories.TokenRepository;
 import com.example.mySpringProject.repositories.UserRepository;
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -118,7 +119,7 @@ public class AuthenticationService {
 
     public ResponseEntity<AuthenticationDAO> activateAccount(String token) throws MessagingException, ProjectException {
         var savedToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new ProjectException(INVALID_TOKEN));
+                .orElseThrow(() -> new ProjectException(TOKEN_DOES_NOT_EXIST));
         if(LocalDateTime.now().isAfter(savedToken.getExpiresAt())){
             sendValidationEmail(savedToken.getUser());
             throw new ProjectException(ACTIVATION_TOKEN_EXPIRED);
@@ -210,6 +211,7 @@ public class AuthenticationService {
         return userRepository.findAll();
     }
 
+    @Transactional
     public AuthenticationDAO resetPassword(String token, ResetPasswordRequest resetPasswordRequest) throws ProjectException {
         var resetPasswordTokenOpt = resetPasswordTokenRepository.findByToken(token);
         if(resetPasswordTokenOpt.isEmpty()){
