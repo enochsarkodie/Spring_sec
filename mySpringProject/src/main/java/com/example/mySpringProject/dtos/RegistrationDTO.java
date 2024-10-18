@@ -1,13 +1,9 @@
 package com.example.mySpringProject.dtos;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-
 public class RegistrationDTO {
     @Email(message = "Email is not formatted")
     @NotEmpty(message = "Email is mandatory")

@@ -50,9 +50,9 @@ public class AuthenticationService {
     @Value("${resetPasswordUrl}")
     private String resetPasswordUrl;
 
-    public ResponseEntity<AuthenticationDAO> registerUser( @Valid RegistrationDTO registrationDTO) throws ProjectException, MessagingException {
+    public ResponseEntity<AuthenticationDAO> registerUser(  @Valid RegistrationDTO registrationDTO) throws ProjectException, MessagingException {
 
-         var existingUser = userRepository.findByEmailIgnoreCase(registrationDTO.getEmail());
+         var existingUser = userRepository.findByEmail(registrationDTO.getEmail());
          if(existingUser.isPresent()){
              throw new ProjectException(EMAIL_ALREADY_EXIST);
          }
@@ -179,7 +179,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationDAO forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws ProjectException, MessagingException {
-        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(forgotPasswordRequest.getEmail());
+        Optional<User> existingUser = userRepository.findByEmail(forgotPasswordRequest.getEmail());
         if(existingUser.isEmpty()){
             throw new ProjectException(USER_NOT_FOUND);
         }
@@ -223,7 +223,7 @@ public class AuthenticationService {
         }
 
         var userEmail = resetPasswordToken.getUser().getEmail();
-        var user = userRepository.findByEmailIgnoreCase(userEmail).orElseThrow(()-> new ProjectException(USER_NOT_FOUND));
+        var user = userRepository.findByEmail(userEmail).orElseThrow(()-> new ProjectException(USER_NOT_FOUND));
 
         var newPassword = resetPasswordRequest.getNewPassword();
         var confirmPassword = resetPasswordRequest.getConfirmPassword();
