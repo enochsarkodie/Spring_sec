@@ -2,7 +2,6 @@ package com.example.mySpringProject.model;
 
 
 import com.example.mySpringProject.model.role.Role;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -54,9 +53,6 @@ public class User implements UserDetails, Principal {
 
     private boolean enabled;
 
-//    @OneToOne(mappedBy = "user")
-//    @JsonBackReference
-//    private ResetPasswordToken resetPasswordToken;
 
 
     @Override
