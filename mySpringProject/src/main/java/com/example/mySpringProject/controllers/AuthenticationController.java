@@ -5,6 +5,7 @@ import com.example.mySpringProject.dao.ForgotPasswordRequest;
 import com.example.mySpringProject.dao.ResetPasswordRequest;
 import com.example.mySpringProject.dtos.AccountLoginDTO;
 import com.example.mySpringProject.dtos.RegistrationDTO;
+import com.example.mySpringProject.dtos.UserResponseDTO;
 import com.example.mySpringProject.exceptionhandlers.ProjectException;
 import com.example.mySpringProject.model.User;
 import com.example.mySpringProject.service.AuthenticationService;
@@ -61,7 +62,7 @@ public class AuthenticationController {
     }
 
     @GetMapping( path = "/getAllUsers")
-    public List<User> getAllUsers(){
+    public List<UserResponseDTO> getAllUsers(){
         return authenticationService.getAllUsers();
     }
     }

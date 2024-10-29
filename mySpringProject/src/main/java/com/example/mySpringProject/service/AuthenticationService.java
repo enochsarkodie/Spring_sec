@@ -1,12 +1,14 @@
 package com.example.mySpringProject.service;
 
 import com.example.mySpringProject.dao.ResetPasswordRequest;
+import com.example.mySpringProject.dtos.UserResponseDTO;
 import com.example.mySpringProject.emailTemplateName.EmailTemplateName;
 import com.example.mySpringProject.dao.AuthenticationDAO;
 import com.example.mySpringProject.dao.ForgotPasswordRequest;
 import com.example.mySpringProject.dtos.AccountLoginDTO;
 import com.example.mySpringProject.dtos.RegistrationDTO;
 import com.example.mySpringProject.exceptionhandlers.ProjectException;
+import com.example.mySpringProject.mapper.UserMapper;
 import com.example.mySpringProject.model.ResetPasswordToken;
 import com.example.mySpringProject.model.TokenModel.Token;
 import com.example.mySpringProject.model.User;
@@ -207,10 +209,6 @@ public class AuthenticationService {
     }
 
 
-    public List<User> getAllUsers (){
-        return userRepository.findAll();
-    }
-
     @Transactional
     public AuthenticationDAO resetPassword(String token, ResetPasswordRequest resetPasswordRequest) throws ProjectException {
         var resetPasswordTokenOpt = resetPasswordTokenRepository.findByToken(token);
@@ -239,6 +237,14 @@ public class AuthenticationService {
                 .status("200")
                 .build();
 
+    }
+
+
+    public List<UserResponseDTO> getAllUsers () {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toDto)
+                .toList();
     }
 
 }
